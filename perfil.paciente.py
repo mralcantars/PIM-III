@@ -13,35 +13,19 @@ usuario_encontrado = None  # variável global
 
 # Cadastro
 if opcao == "2":
-    print("\nVocê deseja se cadastrar como:\n1 - Paciente\n2 - Especialista")
-    tipo = input("Digite 1 ou 2: ").strip()
     nome = input("Nome completo: ").strip()
+    def formatar_cpf(cpf: str) -> str:
+        """Formata o CPF no padrão 000.000.000-00"""
+        return f"{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}"
 
-    # Cadastro Paciente
-    if tipo == "1":
-        while True:
-            cpf = input("CPF (11 dígitos): ").strip()
-            if cpf.isdigit() and len(cpf) == 11:
-                identificador = cpf
-                tipo_usuario = "paciente"
-                break
-            else:
-                print("❌ CPF inválido! Digite apenas 11 números.")
-
-    # Cadastro Especialista
-    elif tipo == "2":
-        while True:
-            crm = input("CRM (6 dígitos): ").strip()
-            if crm.isdigit() and len(crm) == 6:
-                identificador = crm
-                tipo_usuario = "especialista"
-                break
-            else:
-                print("❌ CRM inválido! Digite apenas 6 números.")
-
-    else:
-        print("Opção inválida. Cadastro cancelado.")
-        exit()
+    while True:
+        cpf = input("CPF (11 dígitos): ").strip()
+        if cpf.isdigit() and len(cpf) == 11:
+            identificador = formatar_cpf(cpf)   # <- aqui já salva formatado
+            tipo_usuario = "paciente"
+            break
+        else:
+            print("❌ CPF inválido! Digite apenas 11 números.")
 
     # Criar senha
     while True:
@@ -109,13 +93,17 @@ if usuario_encontrado["tipo"] == "paciente":
         genero = input("Insira seu gênero: ").strip()
         endereco = input("Insira seu endereço: ").title().strip()
 
-        # contato
+       # contato
         while True:
             contato = input("Insira seu telefone para contato (11 dígitos, ex: 11987654321): ").strip()
             if contato.isdigit() and len(contato) == 11:
+                # formatar (DDD) 98765-4321
+                contato_formatado = f"({contato[:2]}) {contato[2:7]}-{contato[7:]}"
                 break
             else:
-                print("Telefone inválido! Digite apenas números e use 11 dígitos.")
+                print("❌ Telefone inválido! Digite apenas números e use 11 dígitos.")
+
+        print("📞 Telefone salvo:", contato_formatado)
 
         # medicamentos
         medicamentos = input("Faz uso de medicamentos contínuos? (sim ou não): ").strip().lower()
@@ -126,9 +114,15 @@ if usuario_encontrado["tipo"] == "paciente":
 
         # preferência de contato
         preferencia_de_contato = input("Por onde devemos entrar em contato (e-mail, telefone ou app): ").strip().lower()
+
         if preferencia_de_contato == "e-mail":
-            email_contato = input("Digite seu e-mail para contato: ").strip()
-            meio_contato = f"E-mail: {email_contato}"
+            while True:
+                email_contato = input("Digite seu e-mail para contato: ").strip()
+                if "@" in email_contato and email_contato.endswith(".com"):
+                    meio_contato = f"E-mail: {email_contato}"
+                    break
+                else:
+                    print("❌ E-mail inválido! Certifique-se de incluir '@' e terminar com '.com'.")
         elif preferencia_de_contato == "telefone":
             meio_contato = f"Telefone: {contato}"
         elif preferencia_de_contato == "app":
@@ -136,12 +130,19 @@ if usuario_encontrado["tipo"] == "paciente":
         else:
             meio_contato = "Nenhum"
 
+        print("📩 Preferência de contato registrada:", meio_contato)
+
         # termos de privacidade
-        print("\n🔒 Termos de privacidade: Seus dados serão usados apenas para fins clínicos, conforme a LGPD.\n")
-        aceitou_termos = input("Você aceita os termos de privacidade (sim/não): ").strip().lower()
-        if aceitou_termos != "sim":
-            print("⚠️ Você deve aceitar os termos para continuar.")
-            exit()
+        while True:
+            print("\n🔒 Termos de privacidade: Seus dados serão usados apenas para fins clínicos, conforme a LGPD.\n")
+            aceitou_termos = input("Você aceita os termos de privacidade (sim/não): ").strip().lower()
+            
+            if aceitou_termos == "sim":
+                print("✅ Termos aceitos! Vamos continuar...")
+                break
+            else:
+                print("⚠️ Você deve aceitar os termos para continuar.\n")
+
 
         # conferindo dados
         while True:
